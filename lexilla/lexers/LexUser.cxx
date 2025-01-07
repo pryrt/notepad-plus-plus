@@ -133,6 +133,29 @@ const int foldingtMapper[MAPPER_TOTAL] =
 using namespace std;
 typedef vector<vector<string>> vvstring;
 
+void pryrt(int idUDL, const wchar_t* prefix, string& s) {
+    wchar_t _pryrt[512];
+    swprintf_s(_pryrt, L"PRYRT: UDL#%08X: %s %s", idUDL, prefix, s);
+    OutputDebugStringW(_pryrt);
+}
+void pryrt(int idUDL, const wchar_t* prefix, wchar_t* s) {
+    wchar_t _pryrt[512];
+    swprintf_s(_pryrt, L"PRYRT: UDL#%08X: %s %s", idUDL, prefix, s);
+    OutputDebugStringW(_pryrt);
+}
+void pryrt(int idUDL, const wchar_t* prefix, vector<string>& vs) {
+    wchar_t _pref[512];
+    for(size_t i=0; i<=vs.size(); i++) {
+        swprintf_s(_pref, L"{vs} %s#%d: ", prefix, i);
+        pryrt(idUDL, _pref, vs[i]);
+    }
+}
+void pryrt(int idUDL, const char* prefix, const char* s) {
+    char _pryrt[512];
+    sprintf_s(_pryrt, "PRYRT: UDL#%08X: %s %s", idUDL, prefix, s);
+    OutputDebugStringA(_pryrt);
+}
+
 // static vector<int> * foldVectorStatic;  // foldVectorStatic is used for debugging only, it should be commented out in production code !
 
 struct forwardStruct
@@ -1291,7 +1314,7 @@ static void ColouriseUserDoc(Sci_PositionU startPos, Sci_Position length, int in
     {
         udlKeywordsMap[sUdlName] = udlKeywordsMapStruct();
     }
-
+    
     vvstring & commentLineOpen      = udlKeywordsMap[sUdlName].commentLineOpen;
     vvstring & commentLineContinue  = udlKeywordsMap[sUdlName].commentLineContinue;
     vvstring & commentLineClose     = udlKeywordsMap[sUdlName].commentLineClose;
@@ -1397,6 +1420,9 @@ static void ColouriseUserDoc(Sci_PositionU startPos, Sci_Position length, int in
         const char * sOperators1             = styler.pprops->Get("userDefine.operators1");
         const char * sComments               = styler.pprops->Get("userDefine.comments");
 
+        pryrt(sUdlName, "sOperators1", sOperators1);
+        pryrt(sUdlName, "sDelimiters", sDelimiters);
+
         // 'GenerateVector' converts strings into vvstring objects
         GenerateVector(commentLineOpen,     sComments,   "00", 0);
         GenerateVector(commentLineContinue, sComments,   "01", commentLineOpen.size());
@@ -1410,6 +1436,7 @@ static void ColouriseUserDoc(Sci_PositionU startPos, Sci_Position length, int in
         GenerateVector(delim2Open,          sDelimiters, "03", 0);
         GenerateVector(delim2Escape,        sDelimiters, "04", delim2Open.size());
         GenerateVector(delim2Close,         sDelimiters, "05", delim2Open.size());
+        pryrt(sUdlName, L"delim2Open[0]", delim2Open[0]);   // vector<string>
         GenerateVector(delim3Open,          sDelimiters, "06", 0);
         GenerateVector(delim3Escape,        sDelimiters, "07", delim3Open.size());
         GenerateVector(delim3Close,         sDelimiters, "08", delim3Open.size());
@@ -2321,6 +2348,36 @@ static void FoldUserDoc(Sci_PositionU /* startPos */, Sci_Position /* length */,
     // }
 }
 
+static const LexicalClass userDefineLexicalClasses[] = { // pryrt added
+	// #,SCE_USER_STYLE_*, tags, description                   
+    0,  "SCE_USER_STYLE_DEFAULT"              , "default", "Default text", 
+    1,  "SCE_USER_STYLE_COMMENT"              , "comment", "Comment block", 
+    2,  "SCE_USER_STYLE_COMMENTLINE"          , "commentline", "Comment line", 
+    3,  "SCE_USER_STYLE_NUMBER"               , "number", "Number", 
+    4,  "SCE_USER_STYLE_KEYWORD1"             , "keyword1", "Keyword group 1", 
+    5,  "SCE_USER_STYLE_KEYWORD2"             , "keyword2", "Keyword group 2", 
+    6,  "SCE_USER_STYLE_KEYWORD3"             , "keyword3", "Keyword group 3", 
+    7,  "SCE_USER_STYLE_KEYWORD4"             , "keyword4", "Keyword group 4", 
+    8,  "SCE_USER_STYLE_KEYWORD5"             , "keyword5", "Keyword group 5", 
+    9,  "SCE_USER_STYLE_KEYWORD6"             , "keyword6", "Keyword group 6", 
+    10, "SCE_USER_STYLE_KEYWORD7"             , "keyword7", "Keyword group 7", 
+    11, "SCE_USER_STYLE_KEYWORD8"             , "keyword8", "Keyword group 8", 
+    12, "SCE_USER_STYLE_OPERATOR"             , "operator", "Operators",
+    13, "SCE_USER_STYLE_FOLDER_IN_CODE1"      , "fold in code1", "Folding in code 1", 
+    14, "SCE_USER_STYLE_FOLDER_IN_CODE2"      , "fold in code2", "Folding in code 2 (separators needed)", 
+    15, "SCE_USER_STYLE_FOLDER_IN_COMMENT"    , "fold in comment", "Folding in comment", 
+    16, "SCE_USER_STYLE_DELIMITER1"           , "delimiter1", "Delimiter1", 
+    17, "SCE_USER_STYLE_DELIMITER2"           , "delimiter2", "Delimiter2", 
+    18, "SCE_USER_STYLE_DELIMITER3"           , "delimiter3", "Delimiter3", 
+    19, "SCE_USER_STYLE_DELIMITER4"           , "delimiter4", "Delimiter4", 
+    20, "SCE_USER_STYLE_DELIMITER5"           , "delimiter5", "Delimiter5", 
+    21, "SCE_USER_STYLE_DELIMITER6"           , "delimiter6", "Delimiter6", 
+    22, "SCE_USER_STYLE_DELIMITER7"           , "delimiter7", "Delimiter7", 
+    23, "SCE_USER_STYLE_DELIMITER8"           , "delimiter8", "Delimiter8", 
+    24, "SCE_USER_STYLE_IDENTIFIER"           , "identifier", "Identifier", 
+};
+
+
 static const char * const userDefineWordLists[] = {
             "Primary keywords and identifiers",
             "Secondary keywords and identifiers",
@@ -2329,4 +2386,4 @@ static const char * const userDefineWordLists[] = {
             0,
         };
 
-extern const LexerModule lmUserDefine(SCLEX_USER, ColouriseUserDoc, "user", FoldUserDoc, userDefineWordLists);
+extern const LexerModule lmUserDefine(SCLEX_USER, ColouriseUserDoc, "user", FoldUserDoc, userDefineWordLists, userDefineLexicalClasses, std::size(userDefineLexicalClasses));
