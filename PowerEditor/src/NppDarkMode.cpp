@@ -3124,6 +3124,9 @@ namespace NppDarkMode
 		if (NppDarkMode::getWindowsBuildNumber() >= win10Build2004)
 		{
 			BOOL value = NppDarkMode::isEnabled() ? TRUE : FALSE;
+#ifndef DWMWA_USE_IMMERSIVE_DARK_MODE 
+#define DWMWA_USE_IMMERSIVE_DARK_MODE 20
+#endif
 			::DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &value, sizeof(value));
 		}
 		else

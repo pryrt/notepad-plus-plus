@@ -135,7 +135,7 @@ typedef vector<vector<string>> vvstring;
 
 void pryrt(int idUDL, const wchar_t* prefix, string& s) {
     wchar_t _pryrt[512];
-    swprintf_s(_pryrt, L"PRYRT: UDL#%08X: %s %s", idUDL, prefix, s);
+    swprintf_s(_pryrt, L"PRYRT: UDL#%08X: %s %s", idUDL, prefix, wstring(s.begin(),s.end()).c_str());
     OutputDebugStringW(_pryrt);
 }
 void pryrt(int idUDL, const wchar_t* prefix, wchar_t* s) {
@@ -146,7 +146,7 @@ void pryrt(int idUDL, const wchar_t* prefix, wchar_t* s) {
 void pryrt(int idUDL, const wchar_t* prefix, vector<string>& vs) {
     wchar_t _pref[512];
     for(size_t i=0; i<=vs.size(); i++) {
-        swprintf_s(_pref, L"{vs} %s#%d: ", prefix, i);
+        swprintf_s(_pref, L"{vs} %s#%llu: ", prefix, i);
         pryrt(idUDL, _pref, vs[i]);
     }
 }
@@ -1420,8 +1420,8 @@ static void ColouriseUserDoc(Sci_PositionU startPos, Sci_Position length, int in
         const char * sOperators1             = styler.pprops->Get("userDefine.operators1");
         const char * sComments               = styler.pprops->Get("userDefine.comments");
 
-        pryrt(sUdlName, "sOperators1", sOperators1);
-        pryrt(sUdlName, "sDelimiters", sDelimiters);
+        //pryrt(sUdlName, "sOperators1", sOperators1);
+        //pryrt(sUdlName, "sDelimiters", sDelimiters);
 
         // 'GenerateVector' converts strings into vvstring objects
         GenerateVector(commentLineOpen,     sComments,   "00", 0);
@@ -1436,7 +1436,7 @@ static void ColouriseUserDoc(Sci_PositionU startPos, Sci_Position length, int in
         GenerateVector(delim2Open,          sDelimiters, "03", 0);
         GenerateVector(delim2Escape,        sDelimiters, "04", delim2Open.size());
         GenerateVector(delim2Close,         sDelimiters, "05", delim2Open.size());
-        pryrt(sUdlName, L"delim2Open[0]", delim2Open[0]);   // vector<string>
+        //pryrt(sUdlName, L"delim2Open[0]", delim2Open[0]);   // vector<string>
         GenerateVector(delim3Open,          sDelimiters, "06", 0);
         GenerateVector(delim3Escape,        sDelimiters, "07", delim3Open.size());
         GenerateVector(delim3Close,         sDelimiters, "08", delim3Open.size());

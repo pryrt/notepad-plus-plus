@@ -8338,6 +8338,8 @@ class lexer : public lexer_base<BasicJsonType>
           locale's decimal point is used instead of `.` to work with the
           locale-dependent converters.
     */
+#pragma warning ( push )
+#pragma warning ( disable: 26438 )
     token_type scan_number()  // lgtm [cpp/use-of-goto]
     {
         // reset token_buffer to store the number's bytes
@@ -8662,6 +8664,7 @@ scan_number_done:
 
         return token_type::value_float;
     }
+#pragma warning ( pop )
 
     /*!
     @param[in] literal_text  the literal text to expect
