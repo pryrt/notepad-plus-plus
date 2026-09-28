@@ -374,7 +374,8 @@ private :
     bool _status = UNDOCK;
     RECT _dlgPos{};
     int _currentHight = 0;
-    int _yScrollPos = 0;
+    int _yScrollPos = 0;      // Vertical scroll position
+    int _scrollLineHeight = 20; // pixels to scroll per line
     int _prevHightVal = 0;
 
 	using Window::init;

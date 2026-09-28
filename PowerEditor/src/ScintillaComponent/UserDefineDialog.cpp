@@ -1539,18 +1539,45 @@ intptr_t CALLBACK UserDefineDialog::run_dlgProc(UINT message, WPARAM wParam, LPA
             int diff = _currentHight - _prevHightVal;
             _prevHightVal = _currentHight;
 
-             int maxPos = originalHight - _currentHight;
+            int maxPosVert = originalHight - _currentHight;
+
+            // 1. Calculate a safe position for the Windows API without altering your tracker yet
+            int targetScrollPos = _yScrollPos;
+            if (maxPosVert <= 0) {
+                targetScrollPos = 0;
+            }
+            else if (targetScrollPos > maxPosVert) {
+                targetScrollPos = maxPosVert;
+            }
+
             // Set the vertical scrolling range and page size
             SCROLLINFO si{};
             si.cbSize = sizeof(si);
-            si.fMask  = SIF_RANGE | SIF_PAGE;
+            si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS | SIF_TRACKPOS | SIF_DISABLENOSCROLL;
             si.nMin   = 0;
-            si.nMax   = (_status == UNDOCK)?0:originalHight;
+            si.nMax   = originalHight;
             si.nPage  = _currentHight;
-            //si.nPos = 0;
+            si.nPos   = targetScrollPos;
             ::SetScrollInfo(_hSelf, SB_VERT, &si, TRUE);
 
-            if ((_yScrollPos >= maxPos) && (_currentHight < originalHight))
+            // recognize WS_VSCROLL by refreshing the Window Style bits
+            LONG_PTR style = ::GetWindowLongPtr(_hSelf, GWL_STYLE);
+            if (_currentHight < originalHight) {
+                // If shrunk, ensure the style bit is explicitly active
+                ::SetWindowLongPtr(_hSelf, GWL_STYLE, style | WS_VSCROLL);
+                ::ShowScrollBar(_hSelf, SB_VERT, TRUE);
+            }
+            else {
+                // Optional: clear it when expanded, or leave it handled by SIF_DISABLENOSCROLL
+                ::SetWindowLongPtr(_hSelf, GWL_STYLE, style & ~WS_VSCROLL);
+                ::ShowScrollBar(_hSelf, SB_VERT, FALSE);
+            }
+
+            // recalculate the frame and redraw the scrollbar
+            // This mimics what happens during your DOCK/UNDOCK transition
+            ::SetWindowPos(_hSelf, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+
+            if ((_yScrollPos >= maxPosVert) && (_currentHight < originalHight))
             {
                 //int nDelta = min(max(maxPos/10,5), maxPos - _yScrollPos);
                 if (_yScrollPos > 0)
