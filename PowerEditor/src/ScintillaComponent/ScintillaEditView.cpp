@@ -1251,6 +1251,12 @@ void ScintillaEditView::setCppLexer(LangType langType) const
 		execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("lexer.cpp.backquoted.strings"), reinterpret_cast<LPARAM>("1"));
 	}
 
+	if ((langType == L_CS) || (langType == L_JAVA) || (langType == L_FLASH)  || (langType == L_SWIFT) || (langType == L_GOLANG))
+	{
+		// these languages use the new feature of Lexilla 5.5.6 to allow custom digit separator of "_", so numbers of the form 1_234_567 will be lexed as numbers still
+		execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("lexer.cpp.digit.separator"), reinterpret_cast<LPARAM>("_"));
+	}
+
 	if (langType != L_RC)
 	{
 		const char* doxygenKeyWords = NppParameters::getInstance().getWordList(L_CPP, LANG_INDEX_TYPE2);
@@ -1374,6 +1380,9 @@ void ScintillaEditView::setJsLexer() const
 	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold.comment"), reinterpret_cast<LPARAM>("1"));
 	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold.cpp.comment.explicit"), reinterpret_cast<LPARAM>("0"));
 	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("fold.preprocessor"), reinterpret_cast<LPARAM>("1"));
+
+	// JS uses the new feature of Lexilla 5.5.6 to allow custom digit separator of "_", so numbers of the form 1_234_567 will be lexed as numbers still
+	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("lexer.cpp.digit.separator"), reinterpret_cast<LPARAM>("_"));
 
 	// Disable track preprocessor to avoid incorrect detection.
 	// In the most of cases, the symbols are defined outside of file.
@@ -1500,6 +1509,9 @@ void ScintillaEditView::setTypeScriptLexer() const
 
 	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("lexer.cpp.track.preprocessor"), reinterpret_cast<LPARAM>("0"));
 	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("lexer.cpp.backquoted.strings"), reinterpret_cast<LPARAM>("1"));
+
+	// TypeScript uses the new feature of Lexilla 5.5.6 to allow custom digit separator of "_", so numbers of the form 1_234_567 will be lexed as numbers still
+	execute(SCI_SETPROPERTY, reinterpret_cast<WPARAM>("lexer.cpp.digit.separator"), reinterpret_cast<LPARAM>("_"));
 }
 
 void ScintillaEditView::setKeywords(LangType langType, const char* keywords, int index) const
